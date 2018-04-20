@@ -52,15 +52,25 @@ prompt_smpl_render() {
     if [[ ! -v PROMPT_SMPL_HIDE_EXEX_TIME && -v prompt_smpl_exec_start ]] then; 
         now=$(($(date +%s%N)/1000000))
         elapsed=$(($now-$prompt_smpl_exec_start))
-        PROMPT_TEXT+=", took %B%F{magenta}${elapsed}ms%f%b"
+
+        if [[ -v PROMPT_SMPL_SHOW_LOW_TIMES || elapsed -gt $PROMPT_SMPL_EXEC_TIME_TRESHOLD ]] then;
+            if [[ ! -v PROMPT_SMPL_USE_MILLIS_ON_EXEC_TIME ]] then;
+                elapsedSec=$(($elapsed/1000))
+                elapsed="`prompt_smpl_human_time_to_var $elapsedSec`"
+            else
+                elapsed+="ms"
+            fi
+            PROMPT_TEXT+=", took %B%F{magenta}${elapsed}%f%b"
+        fi
+
         unset prompt_smpl_exec_start
     fi
 
     # borrowed from https://github.com/sindresorhus/pure/blob/master/pure.zsh#L147-L152
 	local -ah ps1
 	ps1=(
-		$PROMPT_TEXT       # Join parts, space separated.
-		$NEWLINE           # Separate preprompt and prompt.
+		$PROMPT_TEXT
+		$NEWLINE
 		"⤐  "
 	)
 
@@ -77,6 +87,10 @@ prompt_smpm_setup() {
 
     precmd_functions=(prompt_smpl_render)
     preexec_functions=(prompt_smpl_preexec)
+
+    if [[ ! -v PROMPT_SMPL_EXEC_TIME_TRESHOLD ]] then;
+        export PROMPT_SMPL_EXEC_TIME_TRESHOLD=1000
+    fi
 
     PROMPT=""
 }
