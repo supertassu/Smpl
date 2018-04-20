@@ -22,15 +22,11 @@ prompt_smpl_human_time_to_var() {
     echo "$human"
 }
 
-# branch stuff borrowed from https://github.com/denysdovhan/spaceship-prompt/blob/master/sections/git_branch.zsh
+# branch stuff borrowed from https://stackoverflow.com/questions/40082346/how-to-check-if-a-file-exists-in-a-shell-script
 prompt_smtp_git_branch() {
-    local git_current_branch="$vcs_info_msg_0_"
-    if [[ ! -z "$git_current_branch" ]] then;
-        git_current_branch="${git_current_branch#heads/}"
-        git_current_branch="${git_current_branch/.../}"
-
-        echo " on %B%F{yellow}${git_current_branch}%f%b"
-    fi
+    local git_current_branch="${vcs_info_msg_0_}"
+    [[ -z "$git_current_branch" ]] && return
+    echo " on %B%F{yellow}${git_current_branch}%f%b"
 }
 
 prompt_smpl_render() {
@@ -83,6 +79,9 @@ prompt_smpl_preexec() {
 
 prompt_smpm_setup() {
     autoload -U colors && colors
+    autoload -Uz vcs_info
+    zstyle ':vcs_info:git*' formats "%b"
+
     setopt prompt_subst
 
     precmd_functions=(prompt_smpl_render)
