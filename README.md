@@ -27,3 +27,6 @@ If set, executation times lower than `$PROMPT_SMPL_EXEC_TIME_TRESHOLD ms` will b
 
 ### `PROMPT_SMPL_EXEC_TIME_TRESHOLD`
 Defines minimum execution time (in milliseconds) to be displayed on the prompt. Will be ignored if `PROMPT_SMPL_SHOW_LOW_TIMES` is set.
+
+### `PROMPT_SMTP_DISABLE_DIRTY_CHECK`
+If set, the git dirty check will be disabled. Will be ignored if `PROMPT_SMTP_HIDE_GIT_BRANCH` is set.

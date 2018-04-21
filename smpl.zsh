@@ -22,7 +22,6 @@ prompt_smpl_human_time_to_var() {
     echo "$human"
 }
 
-# branch stuff borrowed from https://stackoverflow.com/questions/40082346/how-to-check-if-a-file-exists-in-a-shell-script
 prompt_smtp_git_branch() {
     local git_current_branch="${vcs_info_msg_0_}"
     [[ -z "$git_current_branch" ]] && return
@@ -31,7 +30,7 @@ prompt_smtp_git_branch() {
 
 prompt_smpl_render() {
     NEWLINE=$'\n'
-    PROMPT_TEXT="${NEWLINE}%B‣%b"
+    PROMPT_TEXT="${NEWLINE}%B$fg[grey]‣$reset_color%b"
 
     if [[ ! -v PROMPT_SMPL_HIDE_TIME ]] then;
         PROMPT_TEXT+=" at %B%T%b"
@@ -43,6 +42,15 @@ prompt_smpl_render() {
 
     if [[ ! -v PROMPT_SMTP_HIDE_GIT_BRANCH ]] then;
         PROMPT_TEXT+="`prompt_smtp_git_branch`"
+        if [[ ! -v PROMPT_SMTP_DISABLE_DIRTY_CHECK ]] then;
+            command git diff --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
+            if [[ "$?" -eq 1 ]] then; 
+                PROMPT_TEXT+="?"
+            else
+                command git diff HEAD --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
+                [[ "$?" -eq 1 ]] && PROMPT_TEXT+="!"
+            fi 
+        fi
     fi
 
     if [[ ! -v PROMPT_SMPL_HIDE_EXEX_TIME && -v prompt_smpl_exec_start ]] then; 
