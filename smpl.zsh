@@ -36,13 +36,13 @@ prompt_smpl_render() {
         PROMPT_TEXT+=" at %B%T%b"
     fi
 
-    if [[ ! -v PROMPT-SMPT_HIDE_CWD ]] then; 
+    if [[ ! -v PROMPT_SMPL_HIDE_CWD ]] then; 
         PROMPT_TEXT+=" in %B%F{blue}%~%f%b"
     fi
 
-    if [[ ! -v PROMPT_SMTP_HIDE_GIT_BRANCH ]] then;
+    if [[ ! -v PROMPT_SMTL_HIDE_GIT_BRANCH ]] then;
         PROMPT_TEXT+="`prompt_smtp_git_branch`"
-        if [[ ! -v PROMPT_SMTP_DISABLE_DIRTY_CHECK ]] then;
+        if [[ ! -v PROMPT_SMTL_DISABLE_DIRTY_CHECK ]] then;
             command git diff --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
             if [[ "$?" -eq 1 ]] then; 
                 PROMPT_TEXT+="?"
