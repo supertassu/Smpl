@@ -22,6 +22,10 @@ prompt_smpl_human_time_to_var() {
     echo "$human"
 }
 
+prompt_smpl_command_exists() {
+    command -v $1 > /dev/null 2>&1
+}
+
 prompt_smtp_git_branch() {
     local git_current_branch="${vcs_info_msg_0_}"
     [[ -z "$git_current_branch" ]] && return
@@ -50,6 +54,23 @@ prompt_smpl_render() {
                 command git diff HEAD --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
                 [[ "$?" -eq 1 ]] && PROMPT_TEXT+="!"
             fi 
+        fi
+    fi
+
+    # https://github.com/denysdovhan/spaceship-prompt/blob/master/sections/node.zsh
+    if [[ ! -v PROMPT_SMPL_HIDE_NVM ]] then;
+        if [[ -f package.json || -d node_modules || -n *.js(#qN^/) ]] then;
+            if [[ prompt_smpl_command_exists(nvm) ]] then;
+                node_version=$(nvm current 2>/dev/null)
+            elif spaceship::exists nodenv; then
+                node_version=$(nodenv version-name)
+            fi
+
+            if [[ $node_version == "system" || $node_version == "node" ]] then;
+
+            else
+                PROMPT_TEXT+=" using %B%F{green}⬢ ${node_version}%f%b"
+            fi
         fi
     fi
 
@@ -85,7 +106,7 @@ prompt_smpl_preexec() {
     prompt_smpl_exec_start=$(($(date +%s%N)/1000000))
 }
 
-prompt_smpm_setup() {
+prompt_smpl_setup() {
     autoload -U colors && colors
     autoload -Uz vcs_info
     zstyle ':vcs_info:git*' formats "%b"
@@ -102,4 +123,4 @@ prompt_smpm_setup() {
     PROMPT=""
 }
 
-prompt_smpm_setup
+prompt_smpl_setup

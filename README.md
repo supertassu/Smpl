@@ -22,6 +22,9 @@ If set, git branch will not be shown in the prompt.
 ### `PROMPT_SMTL_DISABLE_DIRTY_CHECK`
 If set, the git dirty check will be disabled. Will be ignored if `PROMPT_SMTP_HIDE_GIT_BRANCH` is set.
 
+### `PROMPT_SMPL_HIDE_NVM`
+If set, current node version (via NVM) will not be shown.
+
 ### `PROMPT_SMPL_HIDE_EXEX_TIME`
 If set, executation time will not be shown in the prompt.
 
