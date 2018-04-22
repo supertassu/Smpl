@@ -1,7 +1,5 @@
 #!/usr/bin/env zsh
 
-autoload -Uz vcs_info
-precmd () { vcs_info }
 setopt prompt_subst
 
 # turns seconds into human readable time
@@ -24,10 +22,11 @@ prompt_smpl_human_time_to_var() {
 
 prompt_smpl_command_exists() {
     command -v $1 > /dev/null 2>&1
+    echo "$?"
 }
 
 prompt_smtp_git_branch() {
-    local git_current_branch="${vcs_info_msg_0_}"
+    local git_current_branch="$(git branch 2>/dev/null | grep '^*' | colrm 1 2)"
     [[ -z "$git_current_branch" ]] && return
     echo " on %B%F{yellow}${git_current_branch}%f%b"
 }
@@ -59,16 +58,17 @@ prompt_smpl_render() {
 
     # https://github.com/denysdovhan/spaceship-prompt/blob/master/sections/node.zsh
     if [[ ! -v PROMPT_SMPL_HIDE_NVM ]] then;
-        if [[ -f package.json || -d node_modules || -n *.js(#qN^/) ]] then;
-            if [[ prompt_smpl_command_exists(nvm) ]] then;
+        if [[ -f package.json || -d node_modules || -f *.js || -f *.jsx ]] then;
+            if [[ "`prompt_smpl_command_exists nvm`" -eq 0 ]] then;
                 node_version=$(nvm current 2>/dev/null)
-            elif spaceship::exists nodenv; then
+            elif [[ "`prompt_smpl_command_exists nodenv`" -eq 0 ]]; then
                 node_version=$(nodenv version-name)
+            else
+                node_version="system"
             fi
 
             if [[ $node_version == "system" || $node_version == "node" ]] then;
-
-            else
+	        elif [[ -v node_version ]]; then
                 PROMPT_TEXT+=" using %B%F{green}⬢ ${node_version}%f%b"
             fi
         fi
@@ -108,8 +108,6 @@ prompt_smpl_preexec() {
 
 prompt_smpl_setup() {
     autoload -U colors && colors
-    autoload -Uz vcs_info
-    zstyle ':vcs_info:git*' formats "%b"
 
     setopt prompt_subst
 
