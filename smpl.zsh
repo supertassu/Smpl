@@ -31,6 +31,28 @@ prompt_smtp_git_branch() {
     echo " on %B%F{yellow}${git_current_branch}%f%b"
 }
 
+prompt_smpl_set_title() {
+    setopt localoptions noshwordsplit
+
+    # emacs terminal does not support settings the title
+    (( ${+EMACS} )) && return
+
+    case $TTY in
+        # Don't set title over serial console.
+        /dev/ttyS[0-9]*) return;;
+    esac
+
+    local -a opts
+    case $1 in
+        expand-prompt) opts=(-P);;
+        ignore-escape) opts=(-r);;
+    esac
+
+    # Set title atomically in one print statement so that it works
+    # when XTRACE is enabled.
+    print -n $opts $'\e]0;'${hostname}${2}$'\a'
+}
+
 prompt_smpl_render() {
     NEWLINE=$'\n'
     PROMPT_TEXT="${NEWLINE}%B$fg[grey]‣$reset_color%b"
@@ -68,7 +90,7 @@ prompt_smpl_render() {
             fi
 
             if [[ $node_version == "system" || $node_version == "node" ]] then;
-	        elif [[ -v node_version ]]; then
+            elif [[ -v node_version ]]; then
                 PROMPT_TEXT+=" using %B%F{green}⬢ ${node_version}%f%b"
             fi
         fi
@@ -92,18 +114,23 @@ prompt_smpl_render() {
     fi
 
     # borrowed from https://github.com/sindresorhus/pure/blob/master/pure.zsh#L147-L152
-	local -ah ps1
-	ps1=(
-		$PROMPT_TEXT
-		$NEWLINE
-		"⤐  "
-	)
+    local -ah ps1
+    ps1=(
+        $PROMPT_TEXT
+        $NEWLINE
+        "⤐  "
+    )
 
-	PROMPT="${(j..)ps1}"
+    PROMPT="${(j..)ps1}"
 }
 
 prompt_smpl_preexec() {
+    prompt_smpl_set_title 'ignore-escape' "$PWD:t: $2"
     prompt_smpl_exec_start=$(($(date +%s%N)/1000000))
+}
+
+prompt_smpl_precmd() {
+    prompt_smpl_set_title 'expand-prompt' '%~'
 }
 
 prompt_smpl_setup() {
@@ -111,8 +138,9 @@ prompt_smpl_setup() {
 
     setopt prompt_subst
 
-    precmd_functions=(prompt_smpl_render)
-    preexec_functions=(prompt_smpl_preexec)
+    add-zsh-hook precmd prompt_smpl_render
+    add-zsh-hook precmd prompt_smpl_precmd
+    add-zsh-hook preexec prompt_smpl_preexec
 
     if [[ ! -v PROMPT_SMPL_EXEC_TIME_TRESHOLD ]] then;
         export PROMPT_SMPL_EXEC_TIME_TRESHOLD=1000
