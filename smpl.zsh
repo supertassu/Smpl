@@ -57,6 +57,12 @@ prompt_smpl_render() {
     NEWLINE=$'\n'
     PROMPT_TEXT="${NEWLINE}%B$fg[grey]‣$reset_color%b"
 
+    if [[ ! -v PROMPT_SMPL_HIDE_USER_SSH ]] then;
+        if [[ -v SSH_CLIENT ]] then;
+            PROMPT_TEXT+=" %B%F{cyan}%n@%m%f%b"
+        fi
+    fi
+
     if [[ ! -v PROMPT_SMPL_HIDE_TIME ]] then;
         PROMPT_TEXT+=" at %B%T%b"
     fi
