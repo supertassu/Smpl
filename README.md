@@ -1,6 +1,6 @@
 # Smpl 
 
-![Screeshot](https://i.imgur.com/TYzXJ8V.jpg)<br/>
+![Screenshot](https://safe.tassu.me/nyCYwOa2zDXvzu0uhYINlXAzrskQLhxk.png)<br/>
 Smpl is a (very wip) zsh prompt focusing on simplicity and elegancy.
 
 ```shell
@@ -9,6 +9,9 @@ antibody bundle supertassu/Smpl
 ```
 
 ## Configuration
+
+### `PROMPT_SMPL_HIDE_USER_SSH`
+If set, the user name will be hidden even when the user has connected via SSH. (It's hidden by default.)
 
 ### `PROMPT_SMPL_HIDE_TIME`
 If set, time will not be shown in the prompt.
