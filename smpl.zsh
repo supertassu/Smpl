@@ -40,13 +40,15 @@ prompt_smpl_check_git_arrows() {
 
     [[ -z "$1" ]] && return
 
-	local arrows splitted="$(echo $1 | awk '{
+	local splitted="$(echo $1 | awk '{
         if ($1 != "0")
             printf "⇡"
         if ($2 != 0)
             printf "⇣"
         }')"
     echo "$splitted"
+
+    echo $splitted | awk '{ gsub(/[ \t]+$/, "", $1); length("$1") == 0 ? "" : " %B{cyan}" $1 "%b" }'
 }
 
 prompt_smpl_set_title() {
@@ -98,17 +100,17 @@ prompt_smpl_render() {
         if [[ ! -v PROMPT_SMTL_DISABLE_DIRTY_CHECK ]] then;
             command git diff --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
             if [[ "$?" -eq 1 ]] then; 
-                PROMPT_TEXT+="?"
+                PROMPT_TEXT+="%F{cyan}*%f"
             else
                 command git diff HEAD --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
-                [[ "$?" -eq 1 ]] && PROMPT_TEXT+="!"
+                [[ "$?" -eq 1 ]] && PROMPT_TEXT+="%F{cyan}★%f"
             fi 
         fi
 
         if [[ ! -v PROMPT_SMPL_DISABLE_GIT_PULL_PUSH_CHECK ]] then;
             local output="$(git rev-list --left-right --count HEAD...@'{u}' 2> /dev/null)"
             local ARROWS="$(prompt_smpl_check_git_arrows $output)"
-            [[ ! -z ARROWS ]] && PROMPT_TEXT+=" %F{cyan}$ARROWS%f"
+            PROMPT_TEXT+="$ARROWS"
         fi
     fi
 
