@@ -25,10 +25,28 @@ prompt_smpl_command_exists() {
     echo "$?"
 }
 
-prompt_smtp_git_branch() {
-    local git_current_branch="$(git branch 2>/dev/null | grep '^*' | colrm 1 2)"
+# git related stuff
+
+prompt_smpl_git_branch() {
+    local git_current_branch="$(git branch 2>/dev/null | grep '^*' | colrm 1 2 )"
     [[ -z "$git_current_branch" ]] && return
-    echo " on %B%F{yellow}${git_current_branch}%f%b"
+    echo " on %B%F{blue}\ue725 ${git_current_branch}%f%b"
+}
+
+# shamelessy stolen from https://github.com/sindresorhus/pure/blob/master/pure.zsh
+
+prompt_smpl_check_git_arrows() {
+    setopt localoptions noshwordsplit
+
+    [[ -z "$1" ]] && return
+
+	local arrows splitted="$(echo $1 | awk '{
+        if ($1 != "0")
+            printf "⇡"
+        if ($2 != 0)
+            printf "⇣"
+        }')"
+    echo "$splitted"
 }
 
 prompt_smpl_set_title() {
@@ -72,11 +90,11 @@ prompt_smpl_render() {
     fi
 
     if [[ ! -v PROMPT_SMPL_HIDE_CWD ]] then; 
-        PROMPT_TEXT+=" in %B%F{blue}%~%f%b"
+        PROMPT_TEXT+=" in %B%F{yellow}%~%f%b"
     fi
 
     if [[ ! -v PROMPT_SMTL_HIDE_GIT_BRANCH ]] then;
-        PROMPT_TEXT+="`prompt_smtp_git_branch`"
+        PROMPT_TEXT+="`prompt_smpl_git_branch`"
         if [[ ! -v PROMPT_SMTL_DISABLE_DIRTY_CHECK ]] then;
             command git diff --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
             if [[ "$?" -eq 1 ]] then; 
@@ -85,6 +103,12 @@ prompt_smpl_render() {
                 command git diff HEAD --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
                 [[ "$?" -eq 1 ]] && PROMPT_TEXT+="!"
             fi 
+        fi
+
+        if [[ ! -v PROMPT_SMPL_DISABLE_GIT_PULL_PUSH_CHECK ]] then;
+            local output="$(git rev-list --left-right --count HEAD...@'{u}' 2> /dev/null)"
+            local ARROWS="$(prompt_smpl_check_git_arrows $output)"
+            [[ ! -z ARROWS ]] && PROMPT_TEXT+=" %F{cyan}$ARROWS%f"
         fi
     fi
 
