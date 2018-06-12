@@ -101,15 +101,18 @@ prompt_smpl_render() {
             command git diff --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
             if [[ "$?" -eq 1 ]] then; 
                 PROMPT_TEXT+=" %F{cyan}☆%f"
+                local SPACE_ADDED=true
             else
                 command git diff HEAD --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
                 [[ "$?" -eq 1 ]] && PROMPT_TEXT+=" %F{cyan}★%f"
+                local SPACE_ADDED=true
             fi 
         fi
 
         if [[ ! -v PROMPT_SMPL_DISABLE_GIT_PULL_PUSH_CHECK ]] then;
             local output="$(git rev-list --left-right --count HEAD...@'{u}' 2> /dev/null)"
             local ARROWS="$(prompt_smpl_check_git_arrows $output)"
+            [[ ! -v SPACE_ADDED ]] && PROMPT_TEXT+=" "
             PROMPT_TEXT+="%F{cyan}$ARROWS%f"
         fi
     fi
