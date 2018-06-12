@@ -95,24 +95,26 @@ prompt_smpl_render() {
         PROMPT_TEXT+=" in %B%F{yellow}%~%f%b"
     fi
 
+    local SPACE_ADDED=false
+
     if [[ ! -v PROMPT_SMTL_HIDE_GIT_BRANCH ]] then;
         PROMPT_TEXT+="`prompt_smpl_git_branch`"
         if [[ ! -v PROMPT_SMTL_DISABLE_DIRTY_CHECK ]] then;
             command git diff --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
             if [[ "$?" -eq 1 ]] then; 
                 PROMPT_TEXT+=" %F{cyan}☆%f"
-                local SPACE_ADDED=true
+                SPACE_ADDED=true
             else
                 command git diff HEAD --no-ext-diff --quiet --exit-code >> /dev/null &> /dev/null
                 [[ "$?" -eq 1 ]] && PROMPT_TEXT+=" %F{cyan}★%f"
-                local SPACE_ADDED=true
+                SPACE_ADDED=true
             fi 
         fi
 
         if [[ ! -v PROMPT_SMPL_DISABLE_GIT_PULL_PUSH_CHECK ]] then;
             local output="$(git rev-list --left-right --count HEAD...@'{u}' 2> /dev/null)"
             local ARROWS="$(prompt_smpl_check_git_arrows $output)"
-            [[ ! -v SPACE_ADDED ]] && PROMPT_TEXT+=" "
+            [[ "$SPACE_ADDED" -eq "false" ]] && PROMPT_TEXT+=" "
             PROMPT_TEXT+="%F{cyan}$ARROWS%f"
         fi
     fi
