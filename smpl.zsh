@@ -58,8 +58,12 @@ prompt_smpl_render() {
     PROMPT_TEXT="${NEWLINE}%B$fg[grey]‣$reset_color%b"
 
     if [[ ! -v PROMPT_SMPL_HIDE_USER_SSH ]] then;
-        if [[ -v SSH_CLIENT ]] then;
-            PROMPT_TEXT+=" %B%F{cyan}%n@%m%f%b"
+        [[ -v SSH_CLIENT ]] && PROMPT_TEXT+=" %B%F{cyan}%n@%m%f%b"
+    fi
+
+    if [[ ! -v SSH_CLIENT ]] then;
+        if [[ ! -v PROMPT_SMPL_HIDE_USER_ROOT ]] then;
+            [[ $UID -eq 0 ]] && PROMPT_TEXT+=" %B%F{cyan}%n%f%b"
         fi
     fi
 
