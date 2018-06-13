@@ -13,6 +13,9 @@ antibody bundle supertassu/Smpl
 ### `PROMPT_SMPL_HIDE_USER_SSH`
 If set, the user name will be hidden even when the user has connected via SSH. (It's hidden by default.)
 
+### `PROMPT_SMPL_HIDE_USER_ROOT`
+If set, the user name will be hidden even if the current user is root.
+
 ### `PROMPT_SMPL_HIDE_TIME`
 If set, time will not be shown in the prompt.
 
